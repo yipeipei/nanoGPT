@@ -10,6 +10,10 @@ dated:
 
 ####### END-OF-TEMPLATE
 
+train-gpt2-single-gpu:
+	python \
+	train.py config/train_gpt2.py
+
 train-gpt2-ddp:
 	torchrun --standalone --nproc_per_node=2 \
 	train.py config/train_gpt2.py
