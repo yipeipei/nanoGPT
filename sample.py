@@ -5,6 +5,7 @@ import os
 import pickle
 from contextlib import nullcontext
 import torch
+import vendor.npu
 import tiktoken
 from model import GPTConfig, GPT
 

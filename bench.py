@@ -6,6 +6,7 @@ from contextlib import nullcontext
 import numpy as np
 import time
 import torch
+import vendor.npu
 from model import GPTConfig, GPT
 
 # -----------------------------------------------------------------------------
