@@ -10,6 +10,10 @@ dated:
 
 ####### END-OF-TEMPLATE
 
+# stop
+# wandb: Enter your choice:
+export WANDB_MODE=offline
+
 train-gpt2-single-gpu:
 	python \
 	train.py config/train_gpt2.py
