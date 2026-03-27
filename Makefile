@@ -46,3 +46,18 @@ train-gpt2-ddp:
 	torchrun --standalone --nproc_per_node=2 \
 	train.py config/train_gpt2.py \
 	${GPT2_${GPU}_ARGS}
+
+RDZV_PORT=29700
+
+train-gpt2-ddp-inter-node:
+	export NCCL_SOCKET_IFNAME=${NCCL_SOCKET_IFNAME} && \
+	torchrun --nproc_per_node=1 --nnodes=2 --node_rank=${NODE_RANK} \
+	--rdzv_id=456 --rdzv_endpoint=${HOST_NODE_ADDR} \
+	train.py config/train_gpt2.py \
+	${GPT2_${GPU}_ARGS}
+
+train-gpt2-ddp-inter-node-4080a:
+	make train-gpt2-ddp-inter-node HOST_NODE_ADDR=10.205.1.20:${RDZV_PORT} NODE_RANK=0 NCCL_SOCKET_IFNAME=eno4np3
+
+train-gpt2-ddp-inter-node-4080b:
+	make train-gpt2-ddp-inter-node HOST_NODE_ADDR=10.205.1.20:${RDZV_PORT} NODE_RANK=1 NCCL_SOCKET_IFNAME=eno4np3
