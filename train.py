@@ -25,7 +25,8 @@ from contextlib import nullcontext
 import numpy as np
 import torch
 import vendor.npu
-from torch.nn.parallel import DistributedDataParallel as DDP
+# from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from torch.distributed import init_process_group, destroy_process_group
 
 from model import GPTConfig, GPT
@@ -210,7 +211,8 @@ if compile:
 
 # wrap model into DDP container
 if ddp:
-    model = DDP(model, device_ids=[ddp_local_rank])
+    # model = DDP(model, device_ids=[ddp_local_rank])
+    model = FSDP(model, device_id=ddp_local_rank, use_orig_params=True)
 
 # helps estimate an arbitrarily accurate loss over either split using many batches
 @torch.no_grad()
