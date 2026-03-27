@@ -61,3 +61,7 @@ train-gpt2-ddp-inter-node-4080a:
 
 train-gpt2-ddp-inter-node-4080b:
 	make train-gpt2-ddp-inter-node HOST_NODE_ADDR=10.205.1.20:${RDZV_PORT} NODE_RANK=1 NCCL_SOCKET_IFNAME=eno4np3
+
+train-gpt2-fsdp1-inter-node-4080a: train-gpt2-ddp-inter-node-4080a
+
+train-gpt2-fsdp1-inter-node-4080b: train-gpt2-ddp-inter-node-4080b
