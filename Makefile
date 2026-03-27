@@ -18,10 +18,20 @@ GPU=NVIDIA
 # GPU=METAX
 # GPU=ASCEND
 
+# Test
 GPT2_ARGS=\
 --batch_size=8 \
 --max_iters=100 --lr_decay_iters=100 \
 --eval_interval=20
+
+# Bench
+# GPT2_ARGS=\
+# --batch_size=8 \
+# --max_iters=1000 --lr_decay_iters=1000 \
+# --eval_interval=200
+
+# Full
+# GPT2_ARGS=\
 
 GPT2_NVIDIA_ARGS=${GPT2_ARGS}
 GPT2_METAX_ARGS=${GPT2_ARGS}
