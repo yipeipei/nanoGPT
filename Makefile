@@ -47,6 +47,8 @@ train-gpt2-ddp:
 	train.py config/train_gpt2.py \
 	${GPT2_${GPU}_ARGS}
 
+train-gpt2-fsdp1: train-gpt2-ddp
+
 RDZV_PORT=29700
 
 train-gpt2-ddp-inter-node:
