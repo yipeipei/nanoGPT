@@ -284,11 +284,15 @@ if ddp:
     # stage_mod = pipe.get_stage_module(stage_index)
     stage_mod = stage.submod
     print(stage_mod)
-    optimizer = torch.optim.SGD(stage_mod.parameters(), lr=1e-3)
+    # optimizer = torch.optim.SGD(stage_mod.parameters(), lr=1e-3)
 
     schedule = ScheduleGPipe(stage, n_microbatches=num_microbatches, loss_fn=F.cross_entropy)
 
+    unsplited_model = model
+    model = stage_mod
+
 # optimizer
+model.configure_optimizers = unsplited_model.configure_optimizers
 optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
 if init_from == 'resume':
     optimizer.load_state_dict(checkpoint['optimizer'])
