@@ -287,7 +287,8 @@ if ddp:
     print(stage_mod)
     # optimizer = torch.optim.SGD(stage_mod.parameters(), lr=1e-3)
 
-    schedule = ScheduleGPipe(stage, n_microbatches=num_microbatches, loss_fn=F.cross_entropy)
+    # schedule = ScheduleGPipe(stage, n_microbatches=num_microbatches, loss_fn=F.cross_entropy)
+    schedule = ScheduleGPipe(stage, n_microbatches=num_microbatches, loss_fn=GPT.tokenwise_loss_fn)
 
     unsplited_model = model
     model = stage_mod
