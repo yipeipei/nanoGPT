@@ -29,6 +29,7 @@ import vendor.npu
 # from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, PipelineStage, ScheduleGPipe
+import torch.nn.functional as F
 from torch.distributed import init_process_group, destroy_process_group
 
 from model import GPTConfig, GPT
@@ -273,7 +274,19 @@ scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
 # wrap model into DDP container
 if ddp:
     # model = DDP(model, device_ids=[ddp_local_rank])
-    model = FSDP(model, device_id=ddp_local_rank, use_orig_params=True)
+    # model = FSDP(model, device_id=ddp_local_rank, use_orig_params=True)
+    X, Y = get_batch('train')
+    train_data = [(X, Y)]
+
+    num_microbatches = 4
+    stage = prepare_pp(model, train_data, num_microbatches)
+
+    # stage_mod = pipe.get_stage_module(stage_index)
+    stage_mod = stage.submod
+    print(stage_mod)
+    optimizer = torch.optim.SGD(stage_mod.parameters(), lr=1e-3)
+
+    schedule = ScheduleGPipe(stage, n_microbatches=num_microbatches, loss_fn=F.cross_entropy)
 
 # optimizer
 optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
