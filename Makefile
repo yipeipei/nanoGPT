@@ -49,6 +49,8 @@ train-gpt2-ddp:
 
 train-gpt2-fsdp1: train-gpt2-ddp
 
+train-gpt2-pp: train-gpt2-ddp
+
 RDZV_PORT=29700
 
 train-gpt2-ddp-inter-node:
@@ -67,3 +69,7 @@ train-gpt2-ddp-inter-node-4080b:
 train-gpt2-fsdp1-inter-node-4080a: train-gpt2-ddp-inter-node-4080a
 
 train-gpt2-fsdp1-inter-node-4080b: train-gpt2-ddp-inter-node-4080b
+
+train-gpt2-pp-inter-node-4080a: train-gpt2-ddp-inter-node-4080a
+
+train-gpt2-pp-inter-node-4080b: train-gpt2-ddp-inter-node-4080b
