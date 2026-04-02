@@ -280,7 +280,8 @@ if ddp:
     train_data = [(X, Y)]
 
     num_microbatches = 4
-    stage = prepare_pp(model, train_data, num_microbatches)
+    with ctx:
+        stage = prepare_pp(model, train_data, num_microbatches)
 
     # stage_mod = pipe.get_stage_module(stage_index)
     stage_mod = stage.submod
@@ -309,14 +310,15 @@ if compile:
 X, y = next(iter(train_data))
 X, y = X.to(device), y.to(device)
 
-if stage.is_first:
-    schedule.step(X)
-elif stage.is_last:
-    losses = []
-    output = schedule.step(target=y, losses=losses)
-    print(f"losses: {losses}")
-else:
-    schedule.step()
+with ctx:
+    if stage.is_first:
+        schedule.step(X)
+    elif stage.is_last:
+        losses = []
+        output = schedule.step(target=y, losses=losses)
+        print(f"losses: {losses}")
+    else:
+        schedule.step()
 
 # helps estimate an arbitrarily accurate loss over either split using many batches
 @torch.no_grad()
