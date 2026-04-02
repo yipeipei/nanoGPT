@@ -305,6 +305,18 @@ if compile:
     unoptimized_model = model
     model = torch.compile(model) # requires PyTorch 2.0
 
+X, y = next(iter(train_data))
+X, y = X.to(device), y.to(device)
+
+if stage.is_first:
+    schedule.step(X)
+elif stage.is_last:
+    losses = []
+    output = schedule.step(target=y, losses=losses)
+    print(f"losses: {losses}")
+else:
+    schedule.step()
+
 # helps estimate an arbitrarily accurate loss over either split using many batches
 @torch.no_grad()
 def estimate_loss():
