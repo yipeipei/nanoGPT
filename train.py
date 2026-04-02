@@ -197,12 +197,6 @@ model.to(device)
 # initialize a GradScaler. If enabled=False scaler is a no-op
 scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
 
-# optimizer
-optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
-if init_from == 'resume':
-    optimizer.load_state_dict(checkpoint['optimizer'])
-checkpoint = None # free up memory
-
 # compile the model
 if compile:
     print("compiling the model... (takes a ~minute)")
@@ -213,6 +207,12 @@ if compile:
 if ddp:
     # model = DDP(model, device_ids=[ddp_local_rank])
     model = FSDP(model, device_id=ddp_local_rank, use_orig_params=True)
+
+# optimizer
+optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
+if init_from == 'resume':
+    optimizer.load_state_dict(checkpoint['optimizer'])
+checkpoint = None # free up memory
 
 # helps estimate an arbitrarily accurate loss over either split using many batches
 @torch.no_grad()
