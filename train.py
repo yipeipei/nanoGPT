@@ -405,7 +405,16 @@ while True:
             # looking at the source of that context manager, it just toggles this variable
             model.require_backward_grad_sync = (micro_step == gradient_accumulation_steps - 1)
         with ctx:
-            logits, loss = model(X, Y)
+            # logits, loss = model(X, Y)
+            if stage.is_first:
+                schedule.step(X)
+            elif stage.is_last:
+                losses = []
+                output = schedule.step(target=Y, losses=losses)
+                # print(f"losses: {losses}")
+            else:
+                schedule.step()
+            # optimizer.step()
             loss = loss / gradient_accumulation_steps # scale the loss to account for gradient accumulation
         # immediately async prefetch next batch while model is doing the forward pass on the GPU
         X, Y = get_batch('train')
