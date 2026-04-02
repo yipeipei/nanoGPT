@@ -155,7 +155,8 @@ config = {k: globals()[k] for k in config_keys} # will be useful for logging
 # various inits, derived attributes, I/O setup
 ddp = int(os.environ.get('RANK', -1)) != -1 # is this a ddp run?
 if ddp:
-    init_process_group(backend=backend)
+    init_distributed()
+    # init_process_group(backend=backend)
     ddp_rank = int(os.environ['RANK'])
     ddp_local_rank = int(os.environ['LOCAL_RANK'])
     ddp_world_size = int(os.environ['WORLD_SIZE'])
