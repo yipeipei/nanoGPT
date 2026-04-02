@@ -26,10 +26,50 @@ import numpy as np
 import torch
 import vendor.npu
 # from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+# from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+import torch.distributed as dist
+from torch.distributed.pipelining import pipeline, SplitPoint, PipelineStage, ScheduleGPipe
 from torch.distributed import init_process_group, destroy_process_group
 
 from model import GPTConfig, GPT
+
+global local_rank, device, pp_group, stage_index, num_stages
+def init_distributed():
+    global local_rank, device, pp_group, stage_index, num_stages
+    local_rank = int(os.environ["LOCAL_RANK"])
+    world_size = int(os.environ["WORLD_SIZE"])
+    device = torch.device(f"cuda:{local_rank}") if torch.cuda.is_available() else torch.device("cpu")
+    dist.init_process_group()
+
+    # This group can be a sub-group in the N-D parallel case
+    pp_group = dist.new_group()
+    global_rank = int(os.environ["RANK"])
+    stage_index = global_rank
+    num_stages = world_size
+
+def tracer_model_split(model, example_input_microbatch) -> PipelineStage:
+    pipe = pipeline(
+        module=model,
+        mb_args=(example_input_microbatch,),
+        split_spec=split_spec
+        # split_spec={
+        #     "linear_relu_stack.2": SplitPoint.BEGINNING,
+        # }
+    )
+
+    print(pipe)
+    # class Pipe(torch.nn.Module):
+
+    stage = pipe.build_stage(stage_index, device, pp_group)
+    return stage
+
+def prepare_pp(model, train_data, num_microbatches):
+    x = next(iter(train_data))[0]
+    x = x.to(device)
+    model = model.to(device)
+    example_input_microbatch = x.chunk(num_microbatches)[0]
+    stage = tracer_model_split(model, example_input_microbatch)
+    return stage
 
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
