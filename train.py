@@ -427,7 +427,9 @@ while True:
             else:
                 schedule.step()
             # optimizer.step()
-            loss = loss / gradient_accumulation_steps # scale the loss to account for gradient accumulation
+            if stage.is_last:
+                loss = torch.stack(losses).mean()
+                loss = loss / gradient_accumulation_steps # scale the loss to account for gradient accumulation
         # immediately async prefetch next batch while model is doing the forward pass on the GPU
         X, Y = get_batch('train')
         # backward pass, with gradient scaling if training in fp16
