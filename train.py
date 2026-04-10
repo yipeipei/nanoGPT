@@ -26,7 +26,7 @@ import numpy as np
 import torch
 import vendor.npu
 # from torch.nn.parallel import DistributedDataParallel as DDP
-# from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, PipelineStage, ScheduleGPipe
 import torch.nn.functional as F
@@ -439,6 +439,8 @@ while True:
     # clip the gradient
     if grad_clip != 0.0:
         scaler.unscale_(optimizer)
+        # TODO investigate
+        # gradient clipping for PP
         if isinstance(model, FSDP):
             model.clip_grad_norm_(grad_clip)
         else:
