@@ -363,7 +363,7 @@ def get_lr(it):
     return min_lr + coeff * (learning_rate - min_lr)
 
 # logging
-if wandb_log and master_process:
+if wandb_log and stage.is_last:
     import wandb
     wandb.init(project=wandb_project, name=wandb_run_name, config=config)
 
