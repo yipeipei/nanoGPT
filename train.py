@@ -339,7 +339,8 @@ def estimate_loss():
                     losses = []
                     output = schedule.step(target=Y, losses=losses)
                     # print(f"losses: {losses}")
-                    iters_losses[k] = losses.item()
+                    loss = torch.stack(losses).mean()
+                    iters_losses[k] = loss.item()
                 else:
                     schedule.step()
         if stage.is_last:
