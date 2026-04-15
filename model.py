@@ -294,12 +294,13 @@ class GPT(nn.Module):
 
         return optimizer
 
-    def estimate_mfu(self, fwdbwd_per_iter, dt):
+    @staticmethod
+    def estimate_mfu(N, config, fwdbwd_per_iter, dt):
         """ estimate model flops utilization (MFU) in units of A100 bfloat16 peak FLOPS """
         # first estimate the number of flops we do per iteration.
         # see PaLM paper Appendix B as ref: https://arxiv.org/abs/2204.02311
-        N = self.get_num_params()
-        cfg = self.config
+        N = N
+        cfg = config
         L, H, Q, T = cfg.n_layer, cfg.n_head, cfg.n_embd//cfg.n_head, cfg.block_size
         flops_per_token = 6*N + 12*L*H*Q*T
         flops_per_fwdbwd = flops_per_token * T
