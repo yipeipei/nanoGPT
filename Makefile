@@ -34,8 +34,8 @@ GPT2_ARGS=\
 # GPT2_ARGS=\
 
 GPT2_NVIDIA_ARGS=${GPT2_ARGS}
-GPT2_METAX_ARGS=${GPT2_ARGS}
-GPT2_ASCEND_ARGS=${GPT2_ARGS} --compile=False
+GPT2_METAX_ARGS=${GPT2_ARGS} --flash=False
+GPT2_ASCEND_ARGS=${GPT2_ARGS} --compile=False --flash=False
 
 train-gpt2-single-gpu:
 	python \
