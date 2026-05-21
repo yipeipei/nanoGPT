@@ -94,6 +94,8 @@ def tracer_model_split(model, example_input_microbatch) -> PipelineStage:
     print(pipe)
     # class Pipe(torch.nn.Module):
 
+    if os.environ["ASCEND_HOME_PATH"]:
+        device = torch.device(f"npu:{local_rank}") if torch.cuda.is_available() else torch.device("cpu")
     stage = pipe.build_stage(stage_index, device, pp_group)
     return stage
 
